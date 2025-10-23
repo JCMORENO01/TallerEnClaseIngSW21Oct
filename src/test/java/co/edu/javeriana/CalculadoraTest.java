@@ -1,8 +1,11 @@
 package co.edu.javeriana;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Tests para la clase Calculadora
  */
@@ -15,6 +18,8 @@ public class CalculadoraTest {
     public void setUp() {
         calculadora = new Calculadora();
     }
+
+    // ----------------- Tests existentes -----------------
 
     @Test
     @DisplayName("Test suma de números positivos")
@@ -82,7 +87,6 @@ public class CalculadoraTest {
                 () -> calculadora.dividir(5, 0),
                 "Dividir por cero debe lanzar IllegalArgumentException"
         );
-
         assertTrue(exception.getMessage().contains("cero"),
                 "El mensaje debe mencionar 'cero'");
     }
@@ -94,5 +98,88 @@ public class CalculadoraTest {
                 "5 % 2 debe ser 1");
         assertEquals(0, calculadora.modulo(10, 5),
                 "10 % 5 debe ser 0");
+    }
+
+    // ----------------- Nuevos tests -----------------
+
+    // Potencia
+    @Test
+    @DisplayName("Potencia: casos básicos")
+    public void testPotenciaBasicos() {
+        assertEquals(1L, calculadora.potencia(7, 0), "b^0 debe ser 1");
+        assertEquals(1024L, calculadora.potencia(2, 10), "2^10 debe ser 1024");
+        assertEquals(-27L, calculadora.potencia(-3, 3), "(-3)^3 debe ser -27");
+        assertEquals(16L, calculadora.potencia(-2, 4), "(-2)^4 debe ser 16");
+        assertEquals(0L, calculadora.potencia(0, 5), "0^5 debe ser 0");
+    }
+
+    @Test
+    @DisplayName("Potencia: exponente negativo lanza excepción")
+    public void testPotenciaExponenteNegativo() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculadora.potencia(2, -1),
+                "Exponente negativo debe lanzar IllegalArgumentException");
+    }
+
+    // Raíz cuadrada
+    @Test
+    @DisplayName("Raíz cuadrada: valores válidos")
+    public void testRaizCuadradaValida() {
+        assertEquals(3.0, calculadora.raizCuadrada(9.0), 1e-9,
+                "sqrt(9) debe ser 3");
+        assertEquals(Math.sqrt(2.0), calculadora.raizCuadrada(2.0), 1e-12,
+                "sqrt(2) debe coincidir con Math.sqrt");
+        assertEquals(0.0, calculadora.raizCuadrada(0.0), 1e-12,
+                "sqrt(0) debe ser 0");
+    }
+
+    @Test
+    @DisplayName("Raíz cuadrada: negativo lanza excepción")
+    public void testRaizCuadradaNegativo() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculadora.raizCuadrada(-0.01),
+                "Raíz de negativo debe lanzar IllegalArgumentException");
+    }
+
+    // Factorial
+    @Test
+    @DisplayName("Factorial: valores base y medianos")
+    public void testFactorialBasicos() {
+        assertEquals(1L, calculadora.factorial(0), "0! debe ser 1");
+        assertEquals(1L, calculadora.factorial(1), "1! debe ser 1");
+        assertEquals(120L, calculadora.factorial(5), "5! debe ser 120");
+        assertEquals(3628800L, calculadora.factorial(10), "10! debe ser 3628800");
+    }
+
+    @Test
+    @DisplayName("Factorial: negativo lanza excepción")
+    public void testFactorialNegativo() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculadora.factorial(-3),
+                "Factorial de negativo debe lanzar IllegalArgumentException");
+    }
+
+    @Test
+    @DisplayName("Factorial: overflow lanza excepción (p.ej., 21!)")
+    public void testFactorialOverflow() {
+        assertThrows(ArithmeticException.class,
+                () -> calculadora.factorial(21),
+                "21! excede long y debe lanzar ArithmeticException");
+    }
+
+    // MCD
+    @Test
+    @DisplayName("MCD: casos típicos")
+    public void testMcdBasicos() {
+        assertEquals(6, calculadora.mcd(54, 24), "mcd(54,24) debe ser 6");
+        assertEquals(5, calculadora.mcd(0, 5), "mcd(0,5) debe ser 5");
+        assertEquals(4, calculadora.mcd(-8, 12), "mcd(-8,12) debe ser 4");
+    }
+
+    @Test
+    @DisplayName("MCD: ambos ceros definido como 0")
+    public void testMcdCeros() {
+        assertEquals(0, calculadora.mcd(0, 0),
+                "mcd(0,0) se define como 0 en esta implementación");
     }
 }

@@ -1,78 +1,10 @@
-name: Java CI con Maven
-
-on:
-  push:
-    branches: [ main, develop ]   # Cambia a [ master, develop ] si tu rama principal es 'master'
-  pull_request:
-    branches: [ main ]
-
-permissions:
-  contents: read
-
-jobs:
-  build:
-    name: Build y Test
-    runs-on: ubuntu-latest
-
-    steps:
-      # Paso 1: Descargar el código del repositorio
-      - name: "📥 Checkout del código"
-        uses: actions/checkout@v4
-
-      # Paso 2: Configurar Java JDK 17
-      - name: "☕ Configurar JDK 17"
-        uses: actions/setup-java@v4
-        with:
-          java-version: "17"
-          distribution: "temurin"
-          cache: maven
-
-      # Paso 3: Compilar el proyecto
-      - name: "🔨 Compilar con Maven"
-        run: mvn -B -ntp clean compile
-
-      # Paso 4: Ejecutar tests
-      - name: "🧪 Ejecutar tests"
-        run: mvn -B -ntp test
-
-      # Paso 5: Generar reporte de tests (HTML en target/site)
-      - name: "📊 Generar reporte de tests"
-        if: always()
-        run: mvn -B -ntp surefire-report:report
-
-      # (Opcional pero útil) Subir reportes de pruebas como artefacto
-      - name: "📤 Subir reportes de pruebas"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: surefire-report
-          path: |
-            target/surefire-reports/**
-            target/site/surefire-report.html
-          retention-days: 5
-
-      # Paso 6: Generar artefacto JAR (sin volver a correr tests)
-      - name: "📦 Empaquetar aplicación"
-        run: mvn -B -ntp package -DskipTests
-
-      # Paso 7: Subir el JAR como artefacto
-      - name: "📤 Subir JAR"
-        uses: actions/upload-artifact@v4
-        with:
-          name: calculadora-jar
-          path: target/*.jar
-          retention-days: 5
-
-      # Paso 8: Mensaje de éxito
-      - name: "✅ Build exitoso"
-        if: success()
-        run: |
-          echo "¡Todos los tests pasaron correctamente!"
-          echo "Artefacto JAR generado y disponible."
-
-      # Paso 9: Mensaje de fallo
-      - name: "❌ Build fallido"
-        if: failure()
-        run: |
-          echo "Algunos tests fallaron o hubo un error en la build."
-          echo "Revisa los reportes de tests para más detalles."
+strategy:
+  matrix:
+  java-version: ['11', '17', '21']
+steps:
+  - name: ☕ Configurar JDK ${{ matrix.java-version }}
+    uses: actions/setup-java@v4
+    with:
+      java-version: ${{ matrix.java-version }}
+      distribution: 'temurin'
+      cache: maven
