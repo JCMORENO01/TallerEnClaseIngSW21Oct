@@ -18,6 +18,7 @@ public class CalculadoraTest {
     public void setUp() {
         calculadora = new Calculadora();
     }
+    // Changes
 
     // ----------------- Tests existentes -----------------
 
