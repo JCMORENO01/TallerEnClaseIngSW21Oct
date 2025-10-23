@@ -1,10 +1,33 @@
-strategy:
-  matrix:
-  java-version: ['11', '17', '21']
-steps:
-  - name: ☕ Configurar JDK ${{ matrix.java-version }}
-    uses: actions/setup-java@v4
-    with:
-      java-version: ${{ matrix.java-version }}
-      distribution: 'temurin'
-      cache: maven
+name: Java CI con Maven
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build y Tests (Java ${{ matrix.java-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: ['11', '17', '21']
+
+    steps:
+      - name: 📥 Checkout del código
+        uses: actions/checkout@v4
+
+      - name: ☕ Configurar JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+          cache: maven
+
+      - name: 🔨 Compilar y ejecutar tests
+        run: mvn -B -ntp clean verify
